@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Room</title>
+</head>
+<body>
+
+<h2>Add New Room</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Room</button>
+</form>
+
+</body>
+</html>

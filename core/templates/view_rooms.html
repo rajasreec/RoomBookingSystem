@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Rooms</title>
+</head>
+<body>
+
+<h2>All Rooms</h2>
+
+<table border="1">
+    <tr>
+        <th>Room Number</th>
+        <th>Room Type</th>
+        <th>Capacity</th>
+        <th>Status</th>
+    </tr>
+
+    {% for room in rooms %}
+    <tr>
+        <td>{{ room.room_number }}</td>
+        <td>{{ room.room_type }}</td>
+        <td>{{ room.capacity }}</td>
+        <td>
+            {% if room.is_available %}
+                Available
+            {% else %}
+                Booked
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+</html>

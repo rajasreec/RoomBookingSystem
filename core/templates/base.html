@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BookSync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Modern Pastel Theme CSS with Dark Mode */
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            /* Light Theme Variables */
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            
+            --bg-gradient: linear-gradient(145deg, #f9f5ff 0%, #f0f5ff 50%, #fff5f5 100%);
+            --navbar-bg: rgba(255, 255, 255, 0.7);
+            --content-bg: rgba(255, 255, 255, 0.7);
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --border-color: rgba(255, 255, 255, 0.5);
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --alert-bg: rgba(255, 255, 255, 0.9);
+            --shape-1: linear-gradient(145deg, #ffdab9, #ffe4e1);
+            --shape-2: linear-gradient(145deg, #e6e6fa, #c8a2c8);
+            --shape-3: linear-gradient(145deg, #98fb98, #87ceeb);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Variables */
+            --gradient-1: linear-gradient(135deg, #845ec2 0%, #d65f8c 100%);
+            --gradient-2: linear-gradient(135deg, #ff6a88 0%, #ff99ac 100%);
+            --gradient-3: linear-gradient(135deg, #5f9ea0 0%, #2e8b57 100%);
+            --gradient-4: linear-gradient(135deg, #6b8cff 0%, #4b6cb7 100%);
+            --gradient-5: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+            
+            --bg-gradient: linear-gradient(145deg, #1a1b2f 0%, #2d1f3a 50%, #1f2a44 100%);
+            --navbar-bg: rgba(18, 18, 35, 0.8);
+            --content-bg: rgba(30, 30, 50, 0.7);
+            --text-primary: #e2e8f0;
+            --text-secondary: #cbd5e0;
+            --border-color: rgba(75, 85, 99, 0.5);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --alert-bg: rgba(40, 40, 60, 0.9);
+            --shape-1: linear-gradient(145deg, #4a2f45, #2d1f3a);
+            --shape-2: linear-gradient(145deg, #2d2f4a, #1f1f3a);
+            --shape-3: linear-gradient(145deg, #1f3a3a, #1f2f4a);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.2s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: var(--navbar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 10px;
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(45deg) scale(1.1);
+            box-shadow: 0 0 20px var(--shadow-color);
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 218, 185, 0.15) 0%, transparent 30%),
+                radial-gradient(circle at 90% 50%, rgba(152, 251, 152, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 30% 80%, rgba(255, 182, 193, 0.12) 0%, transparent 35%),
+                radial-gradient(circle at 70% 10%, rgba(135, 206, 235, 0.1) 0%, transparent 45%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating Shapes - Dark mode adjusted */
+        .shape {
+            position: fixed;
+            background: var(--navbar-bg);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -50px;
+            background: var(--shape-1);
+            animation: float 20s infinite;
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -200px;
+            left: -100px;
+            background: var(--shape-2);
+            animation: float 25s infinite reverse;
+        }
+
+        .shape-3 {
+            width: 200px;
+            height: 200px;
+            top: 40%;
+            left: 10%;
+            background: var(--shape-3);
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: var(--navbar-bg) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            box-shadow: 0 8px 32px var(--shadow-color);
+        }
+
+        .navbar-brand {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .navbar-brand::after {
+            content: '📚';
+            font-size: 1.5rem;
+            margin-left: 10px;
+            background: none;
+            -webkit-text-fill-color: initial;
+        }
+
+        /* Navbar Buttons Container */
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar > .container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Button Styles */
+        .btn {
+            border-radius: 50px !important;
+            padding: 0.6rem 1.5rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: none !important;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 4px 15px var(--shadow-color) !important;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px var(--shadow-color) !important;
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .btn-light {
+            background: var(--gradient-3) !important;
+            color: white !important;
+        }
+
+        .btn-danger {
+            background: var(--gradient-2) !important;
+            color: white !important;
+        }
+
+        .btn-success {
+            background: var(--gradient-4) !important;
+            color: white !important;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1) !important;
+            color: white !important;
+        }
+
+        /* Icon styling for buttons */
+        .btn i {
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Alert Messages */
+        .alert {
+            border-radius: 20px !important;
+            border: none !important;
+            padding: 1.2rem 1.8rem !important;
+            background: var(--alert-bg) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px var(--shadow-color) !important;
+            animation: slideInDown 0.5s ease-out;
+            border-left: 5px solid !important;
+            font-weight: 500;
+            color: var(--text-primary) !important;
+        }
+
+        .alert-info {
+            border-left-color: #667eea !important;
+        }
+
+        [data-theme="dark"] .alert-info {
+            border-left-color: #845ec2 !important;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Container Styling */
+        .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .container.mt-4 {
+            margin-top: 3rem !important;
+        }
+
+        /* Content Cards (for block content) */
+        .content-wrapper {
+            background: var(--content-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 50px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            animation: fadeInUp 0.6s ease-out;
+            color: var(--text-primary);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Pulse Animation for important buttons */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+
+        .btn-primary {
+            animation: pulse 2s infinite;
+        }
+
+        [data-theme="dark"] .btn-primary {
+            animation: pulse-dark 2s infinite;
+        }
+
+        @keyframes pulse-dark {
+            0% { box-shadow: 0 0 0 0 rgba(132, 94, 194, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(132, 94, 194, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(132, 94, 194, 0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .navbar-brand::after {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .content-wrapper {
+                padding: 1.5rem;
+                border-radius: 30px;
+            }
+            
+            .shape-1, .shape-2, .shape-3 {
+                opacity: 0.2;
+            }
+            
+            .nav-actions {
+                gap: 6px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-gradient);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-1);
+            border-radius: 6px;
+            border: 3px solid transparent;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gradient-2);
+        }
+
+        /* Hover effect for navbar brand */
+        .navbar-brand {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        /* Additional decorative elements */
+        .dot-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(var(--text-secondary) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Message counter animation */
+        .alert {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: skewX(-25deg) translateX(-150%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { transform: skewX(-25deg) translateX(300%); }
+        }
+
+        /* Dark mode specific adjustments */
+        [data-theme="dark"] .btn-light,
+        [data-theme="dark"] .btn-danger,
+        [data-theme="dark"] .btn-success,
+        [data-theme="dark"] .btn-primary {
+            color: white !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .content-wrapper {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .navbar-brand {
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Animated Background Shapes -->
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="dot-pattern"></div>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                BookSync
+            </a>
+
+            <div class="nav-actions">
+                <!-- Theme Toggle Button -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </div>
+
+                {% if user.is_authenticated %}
+                    <a class="btn btn-light btn-sm" href="{% url 'dashboard' %}">
+                        <i class="fas fa-chart-pie"></i> Dashboard
+                    </a>
+
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                    {% else %}
+                        <a class="btn btn-success btn-sm" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a class="btn btn-primary btn-sm" href="{% url 'register' %}">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="content-wrapper">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.body;
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        function updateThemeIcon(theme) {
+            if (theme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+            }
+        }
+    </script>
+</body>
+</html>

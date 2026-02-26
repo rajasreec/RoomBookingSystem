@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center">
+    <h1>Welcome to BookSync</h1>
+    <p class="lead">Smart Room & Hall Booking System</p>
+
+    {% if not user.is_authenticated %}
+        <a href="{% url 'login' %}" class="btn btn-success">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+    {% endif %}
+</div>
+{% endblock %}
