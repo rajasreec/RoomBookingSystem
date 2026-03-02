@@ -9,24 +9,24 @@
 
 <table border="1">
     <tr>
-        <th>Room Number</th>
+        <th>Room Name</th>
         <th>Room Type</th>
         <th>Capacity</th>
-        <th>Status</th>
+        <th>Block</th>
+        <th>Floor</th>
     </tr>
 
     {% for room in rooms %}
     <tr>
-        <td>{{ room.room_number }}</td>
+        <td>{{ room.room_name }}</td>
         <td>{{ room.room_type }}</td>
-        <td>{{ room.capacity }}</td>
-        <td>
-            {% if room.is_available %}
-                Available
-            {% else %}
-                Booked
-            {% endif %}
-        </td>
+        <td>{{ room.room_capacity }}</td>
+        <td>{{ room.block_name }}</td>
+        <td>{{ room.floor }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">No rooms available</td>
     </tr>
     {% endfor %}
 

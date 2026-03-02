@@ -24,4 +24,6 @@ urlpatterns = [
     path('create-booking/', views.create_booking, name='create_booking'),
     path('rooms/', views.room_list, name='rooms'),
     path('ajax/load-rooms/', views.load_rooms, name='ajax_load_rooms'),
+    path('approve/<int:booking_id>/', views.approve_booking, name='approve_booking'),
+path('reject/<int:booking_id>/', views.reject_booking, name='reject_booking'),
 ]

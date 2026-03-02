@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from .models import Room 
-
+import re
 User = get_user_model()
 
 
@@ -12,7 +12,13 @@ User = get_user_model()
 class RoomForm(forms.ModelForm):
     class Meta:
         model = Room
-        fields = '__all__'
+        fields = [
+            'room_name',
+            'room_capacity',
+            'block',
+            'floor',
+            'room_type'
+        ]
 
 
 # -------------------------
@@ -38,4 +44,4 @@ class RegisterForm(UserCreationForm):
         if not re.match("^[A-Za-z ]+$", username):
             raise forms.ValidationError("Username should contain only letters.")
 
-        return username
+        return username 

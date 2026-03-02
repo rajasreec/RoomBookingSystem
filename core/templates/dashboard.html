@@ -9,40 +9,42 @@
 </div>
 
 <!-- Statistics Cards -->
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-body text-center">
+<div class="row text-center mt-4">
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-primary text-white">
+            <div class="card-body">
                 <h5>Total Rooms</h5>
                 <h3>{{ total_rooms }}</h3>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card text-white bg-danger mb-3">
-            <div class="card-body text-center">
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-danger text-white">
+            <div class="card-body">
                 <h5>Booked Today</h5>
-                <h3>{{ booked_rooms_today }}</h3>
+                <h3>{{ booked_today }}</h3>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-body text-center">
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-success text-white">
+            <div class="card-body">
                 <h5>Available Today</h5>
-                <h3>{{ available_rooms }}</h3>
+                <h3>{{ available_today }}</h3>
             </div>
         </div>
     </div>
+
 </div>
 
 <!-- Quick Actions -->
-<div style="margin-top: 20px;">
+<div class="mt-4">
 
     <a href="{% url 'create_booking' %}" 
-       class="btn btn-lg"
+       class="btn btn-lg me-2"
        style="background: linear-gradient(45deg, #6a5acd, #836fff); 
               color: white; 
               border-radius: 30px; 
@@ -53,7 +55,7 @@
 
     {% if user.is_superuser %}
     <a href="{% url 'add_room' %}" 
-       class="btn btn-lg"
+       class="btn btn-lg me-2"
        style="background: linear-gradient(45deg, #00c6ff, #0072ff); 
               color: white; 
               border-radius: 30px; 
@@ -76,10 +78,10 @@
 </div>
 
 <!-- Recent Bookings -->
-<h4>Recent Bookings</h4>
+<h3 class="mt-5">Recent Bookings</h3>
 
-<table class="table table-bordered">
-    <thead>
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
         <tr>
             <th>Room</th>
             <th>Date</th>
@@ -105,10 +107,45 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="4">No recent bookings</td>
+            <td colspan="4" class="text-center">No recent bookings</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<!-- Pending Booking Requests (Admin Only) -->
+{% if user.is_superuser and pending_bookings %}
+<h3 class="mt-5">Pending Booking Requests</h3>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>User</th>
+            <th>Room</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in pending_bookings %}
+        <tr>
+            <td>{{ booking.user.username }}</td>
+            <td>{{ booking.room.room_name }}</td>
+            <td>{{ booking.date }}</td>
+            <td>
+                <a class="btn btn-sm btn-success"
+                   href="{% url 'approve_booking' booking.booking_id %}">
+                   Approve
+                </a>
+                <a class="btn btn-sm btn-danger"
+                   href="{% url 'reject_booking' booking.booking_id %}">
+                   Reject
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
 
 {% endblock %}

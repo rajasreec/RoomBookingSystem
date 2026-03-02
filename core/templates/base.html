@@ -483,9 +483,7 @@
                 </div>
 
                 {% if user.is_authenticated %}
-                    <a class="btn btn-light btn-sm" href="{% url 'dashboard' %}">
-                        <i class="fas fa-chart-pie"></i> Dashboard
-                    </a>
+                
 
                     <form action="{% url 'logout' %}" method="post" style="display:inline;">
                         {% csrf_token %}

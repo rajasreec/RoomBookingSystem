@@ -8,6 +8,7 @@ admin.site.register(Room)
 from .models import (
     Department,
     User,
+    Block,
     Room,
     Hall,
     RoomDepartment,
@@ -32,8 +33,9 @@ class CustomUserAdmin(UserAdmin):
     )
 
 
-# Register Room
-
+@admin.register(Block)
+class BlockAdmin(admin.ModelAdmin):
+    list_display = ('block_name',)
 
 
 # Register Hall
