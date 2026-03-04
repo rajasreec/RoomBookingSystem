@@ -1,0 +1,23 @@
+<h2>Available Rooms Today</h2>
+
+<table border="1">
+    <tr>
+        <th>Room Name</th>
+        <th>Block</th>
+        <th>Floor</th>
+        <th>Type</th>
+    </tr>
+
+    {% for room in rooms %}
+    <tr>
+        <td>{{ room.room_name }}</td>
+        <td>{{ room.block }}</td>
+        <td>{{ room.floor }}</td>
+        <td>{{ room.room_type }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">No rooms available today</td>
+    </tr>
+    {% endfor %}
+</table>

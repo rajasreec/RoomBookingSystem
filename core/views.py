@@ -2,33 +2,40 @@ from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.http import JsonResponse
+from django.db.models import Q
+from datetime import date
 
-from .models import Booking, Room
+from .models import Booking, Room, Block
 from .forms import RoomForm
 
 User = get_user_model()
 
 
 # -------------------------
-# Helper Function
+# Helper Functions
 # -------------------------
+
 def is_admin(user):
-    return user.is_superuser or user.role == "admin"
+    return user.is_staff or user.is_superuser
 
 
 # -------------------------
 # Home Page
 # -------------------------
+
 def home(request):
     return redirect("login")
 
 
 # -------------------------
-# Register View
+# Register View (FIXED)
 # -------------------------
+
 def register_view(request):
+
     if request.method == "POST":
         username = request.POST.get("username")
         email = request.POST.get("email")
@@ -41,8 +48,7 @@ def register_view(request):
         User.objects.create_user(
             username=username,
             email=email,
-            password=password,
-            role="student"
+            password=password
         )
 
         messages.success(request, "Account created successfully")
@@ -54,14 +60,16 @@ def register_view(request):
 # -------------------------
 # Login View
 # -------------------------
+
 def login_view(request):
+
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
         user = authenticate(request, username=username, password=password)
 
-        if user is not None:
+        if user:
             login(request, user)
             return redirect("dashboard")
         else:
@@ -74,6 +82,7 @@ def login_view(request):
 # -------------------------
 # Logout View
 # -------------------------
+
 @login_required
 def logout_view(request):
     logout(request)
@@ -83,20 +92,27 @@ def logout_view(request):
 # -------------------------
 # Dashboard
 # -------------------------
+
 @login_required
 def dashboard(request):
+
     today = timezone.now().date()
 
     total_rooms = Room.objects.count()
-    booked_today = Booking.objects.filter(date=today).count()
-    available_today = total_rooms - booked_today
 
-    recent_bookings = Booking.objects.order_by("-created_at")[:5]
+    booked_rooms_today = Booking.objects.filter(date=today) \
+                                         .values("room") \
+                                         .distinct() \
+                                         .count()
+
+    available_rooms_today = total_rooms - booked_rooms_today
+
+    recent_bookings = Booking.objects.order_by("-date")[:5]
 
     return render(request, "dashboard.html", {
         "total_rooms": total_rooms,
-        "booked_today": booked_today,
-        "available_today": available_today,
+        "booked_today": booked_rooms_today,
+        "available_rooms_today": available_rooms_today,
         "recent_bookings": recent_bookings,
     })
 
@@ -104,6 +120,7 @@ def dashboard(request):
 # -------------------------
 # View Rooms
 # -------------------------
+
 @login_required
 def view_rooms(request):
     rooms = Room.objects.all()
@@ -113,9 +130,11 @@ def view_rooms(request):
 # -------------------------
 # Add Room (Admin Only)
 # -------------------------
+
 @login_required
 @user_passes_test(is_admin)
 def add_room(request):
+
     if request.method == "POST":
         form = RoomForm(request.POST)
         if form.is_valid():
@@ -131,99 +150,124 @@ def add_room(request):
 # -------------------------
 # Create Booking
 # -------------------------
+
 @login_required
 def create_booking(request):
 
-    # Filter dropdown data
-    blocks = (
-        Room.objects
-        .values_list("block__block_name", flat=True)
-        .order_by("block__block_name")
-        .distinct()
-    )
-
+    rooms = Room.objects.filter(is_available=True)
+    blocks = Block.objects.all()
     floors = Room.FLOOR_CHOICES
+    room_types = Room.ROOM_TYPE_CHOICES
 
-    room_types = (
-        Room.objects
-        .values_list("room_type", flat=True)
-        .order_by("room_type")
-        .distinct()
-    )
+    if request.method == 'POST':
+        room_id = request.POST.get('room')
+        booking_date = request.POST.get('date')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        purpose = request.POST.get('purpose')
 
-    # IMPORTANT: Get all rooms for dropdown
-    rooms = Room.objects.all()
+        conflict = Booking.objects.filter(
+            room_id=room_id,
+            date=booking_date
+        ).filter(
+            Q(start_time__lt=end_time) & Q(end_time__gt=start_time)
+        ).exists()
 
-    if request.method == "POST":
-        room_id = request.POST.get("room")
-        date = request.POST.get("date")
-        start_time = request.POST.get("start_time")
-        end_time = request.POST.get("end_time")
-        purpose = request.POST.get("purpose")
+        if conflict:
+            messages.error(request, "Room already booked for selected time.")
+            return redirect('create_booking')
 
-        # If using room_id as primary key
-        room = get_object_or_404(Room, room_id=room_id)
         Booking.objects.create(
             user=request.user,
-            room=room,
-            date=date,
+            room_id=room_id,
+            date=booking_date,
             start_time=start_time,
             end_time=end_time,
             purpose=purpose,
-            booking_type="regular",
-            status="pending"
+            status="Pending"
         )
 
-        messages.success(request, "Booking created successfully")
-        return redirect("dashboard")
+        messages.success(request, "Booking request submitted successfully!")
+        return redirect('dashboard')
 
-    return render(request, "create_booking.html", {
-        "blocks": blocks,
-        "floors": floors,
-        "room_types": room_types,
-        "rooms": rooms,
+    return render(request, 'create_booking.html', {
+        'rooms': rooms,
+        'blocks': blocks,
+        'floors': floors,
+        'room_types': room_types,
+    })
+
+# -------------------------
+# Manage Bookings (Admin)
+# -------------------------
+
+@login_required
+@user_passes_test(is_admin)
+def manage_bookings(request):
+    bookings = Booking.objects.all().order_by('-date')
+    return render(request, "manage_booking.html", {"bookings": bookings})
+def booking_detail(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    return render(request, "booking_detail.html", {"booking": booking})
+
+# -------------------------
+# Approve Booking
+# -------------------------
+
+@login_required
+@user_passes_test(is_admin)
+def approve_booking(request, booking_id):
+
+    booking = get_object_or_404(Booking, id=booking_id)
+    booking.status = "Approved"
+    booking.save()
+    return redirect("dashboard")
+
+    messages.success(request, "Booking Approved Successfully.")
+    return redirect("manage_bookings")
+def approve_bookings(request):
+    bookings = Booking.objects.filter(status="Pending")
+    return render(request, "approve_bookings.html", {"bookings": bookings})
+
+# -------------------------
+# Reject Booking
+# -------------------------
+
+@login_required
+@user_passes_test(is_admin)
+def reject_booking(request, booking_id):
+
+    booking = get_object_or_404(Booking, id=booking_id)
+    booking.status = "Rejected"
+    booking.save()
+
+    messages.error(request, "Booking Rejected.")
+    return redirect("manage_bookings")
+
+
+# -------------------------
+# Available Rooms Today
+# -------------------------
+
+@login_required
+def available_rooms_today(request):
+
+    today = timezone.now().date()
+
+    booked_rooms = Booking.objects.filter(date=today) \
+                                   .values_list('room_id', flat=True)
+
+    available_rooms = Room.objects.exclude(id__in=booked_rooms)
+
+    return render(request, 'available_rooms_today.html', {
+        'rooms': available_rooms
     })
 
 
 # -------------------------
-# Approve Booking (Admin Only)
-# -------------------------
-@login_required
-@user_passes_test(is_admin)
-def approve_booking(request, booking_id):
-    booking = get_object_or_404(Booking, booking_id=booking_id)
-    booking.status = "approved"
-    booking.approved_by = request.user
-    booking.save()
-    return redirect("dashboard")
-
-
-# -------------------------
-# Reject Booking (Admin Only)
-# -------------------------
-@login_required
-@user_passes_test(is_admin)
-def reject_booking(request, booking_id):
-    booking = get_object_or_404(Booking, booking_id=booking_id)
-    booking.status = "rejected"
-    booking.approved_by = request.user
-    booking.save()
-    return redirect("dashboard")
-
-
-# -------------------------
-# Room List
-# -------------------------
-@login_required
-def room_list(request):
-    rooms = Room.objects.all()
-    return render(request, "rooms.html", {"rooms": rooms})
-
-from django.http import JsonResponse
-
-# -------------------------
 # AJAX Load Rooms
 # -------------------------
+
 @login_required
 def load_rooms(request):
 
@@ -232,14 +276,14 @@ def load_rooms(request):
     room_type = request.GET.get("room_type")
 
     rooms = Room.objects.filter(
-        block__block_name=block,  
+        block__block_name=block,
         floor=floor,
         room_type=room_type
     )
 
     room_data = [
         {
-            "id": room.room_id,
+            "id": room.id,
             "name": room.room_name
         }
         for room in rooms

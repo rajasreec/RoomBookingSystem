@@ -47,13 +47,14 @@
         <hr>
 
         <!-- ================= ROOM SELECTION ================= -->
-        <div class="mb-3">
-    <label>Select Room</label>
-    <select name="room" id="roomDropdown" class="form-control" required>
-        <option value="">Select Room</option>
-    </select>
-</div>
-
+        <select name="room" id="roomDropdown" class="form-control" required>
+            <option value="">Select Room</option>
+            {% for room in rooms %}
+                <option value="{{ room.id }}">
+                    {{ room.room_name }} - {{ room.department.department_name }}
+                </option>
+            {% endfor %}
+        </select>
         <hr>
 
         <!-- ================= BOOKING DETAILS ================= -->

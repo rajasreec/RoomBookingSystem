@@ -1,0 +1,25 @@
+<h2>All Bookings</h2>
+
+<table border="1">
+    <tr>
+        <th>User</th>
+        <th>Room</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for booking in bookings %}
+    <tr>
+        <td>{{ booking.user }}</td>
+        <td>{{ booking.room }}</td>
+        <td>{{ booking.date }}</td>
+        <td>{{ booking.status }}</td>
+        <td>
+            <a href="{% url 'booking_detail' booking.id %}">
+                View Details
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>

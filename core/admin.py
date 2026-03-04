@@ -53,9 +53,18 @@ class RoomDepartmentAdmin(admin.ModelAdmin):
 # Register Booking
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('booking_id', 'user', 'room', 'date', 'status', 'booking_type')
+    list_display = (
+        'id',          
+        'room',
+        'user',
+        'date',
+        'start_time',
+        'end_time',
+        'status'       
+    )
+
     list_filter = ('status', 'date')
-    search_fields = ('user__username', 'room__room_name')
+    search_fields = ('user__username', 'room')
 
 
 # Register Report

@@ -1,0 +1,23 @@
+<h2>Booking Details</h2>
+
+<p><strong>User:</strong> {{ booking.user }}</p>
+<p><strong>Room:</strong> {{ booking.room }}</p>
+<p><strong>Date:</strong> {{ booking.date }}</p>
+<p><strong>Start Time:</strong> {{ booking.start_time }}</p>
+<p><strong>End Time:</strong> {{ booking.end_time }}</p>
+<p><strong>Purpose:</strong> {{ booking.purpose }}</p>
+<p><strong>Status:</strong> {{ booking.status }}</p>
+
+{% if booking.status == "pending" %}
+    <a href="{% url 'approve_booking' booking.booking_id %}">
+        <button>Approve</button>
+    </a>
+
+    <a href="{% url 'reject_booking' booking.booking_id %}">
+        <button>Reject</button>
+    </a>
+{% endif %}
+
+<a href="{% url 'manage_bookings' %}">
+    <button>Back</button>
+</a>
