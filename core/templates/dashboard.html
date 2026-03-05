@@ -108,7 +108,7 @@
         <tbody>
             {% for booking in recent_bookings %}
             <tr>
-                <td>{{ booking.room_name }}</td>
+                <td>{{ booking.room.room_name }}</td>
                 <td>{{ booking.date }}</td>
                 <td>{{ booking.start_time }} - {{ booking.end_time }}</td>
                 <td>

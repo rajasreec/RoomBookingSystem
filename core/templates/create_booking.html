@@ -39,7 +39,7 @@
             <select name="room_type" class="form-control" required>
                 <option value="">-- Select Room Type --</option>
                 {% for type in room_types %}
-                    <option value="{{ type }}">{{ type }}</option>
+                    <option value="{{ type.0 }}">{{ type.1 }}</option>
                 {% endfor %}
             </select>
         </div>

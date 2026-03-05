@@ -58,7 +58,7 @@ class Block(models.Model):
 # Room Model
 # -------------------------
 class Room(models.Model):
-
+    
     FLOOR_CHOICES = [
         ('Ground', 'Ground'),
         ('First', 'First'),
@@ -71,12 +71,10 @@ class Room(models.Model):
         ('Classroom', 'Classroom'),
         ('Seminar Hall', 'Seminar Hall'),
     ]
-    room_name = models.CharField(max_length=100)
-    room_id = models.AutoField(primary_key=True)
+
     room_name = models.CharField(max_length=100)
     room_capacity = models.IntegerField()
 
-    # ✅ Use ForeignKey instead of CharField
     block = models.ForeignKey(Block, on_delete=models.CASCADE)
 
     floor = models.CharField(max_length=20, choices=FLOOR_CHOICES)
