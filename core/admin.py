@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Room
+from .models import Room,RoomType
 
 admin.site.register(Room)
 from .models import (
@@ -77,3 +77,6 @@ class ReportAdmin(admin.ModelAdmin):
 @admin.register(EmailNotification)
 class EmailNotificationAdmin(admin.ModelAdmin):
     list_display = ('notification_id', 'booking', 'sent_time')
+
+
+admin.site.register(RoomType)

@@ -1,137 +1,59 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 <div class="container mt-4">
     <h2 class="mb-4">Create Booking</h2>
 
+    <!-- ================= BLOCK SELECTION ================= -->
+    <form method="GET" class="mb-4">
+        <div class="mb-3">
+            <label class="form-label">Select Block</label>
+            <select name="block_name" class="form-control" onchange="this.form.submit()">
+                <option value="">-- Select Block --</option>
+                {% for block in blocks %}
+                    <option value="{{ block.block_name }}" {% if block.block_name == selected_block_name %}selected{% endif %}>
+                        {{ block.block_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <!-- ================= BOOKING FORM ================= -->
     <form method="POST">
         {% csrf_token %}
 
-        <!-- ================= FILTER SECTION ================= -->
-        <h5 class="mb-3">Filter Rooms</h5>
-
-        <!-- Block -->
         <div class="mb-3">
-            <label class="form-label">Block</label>
-            <select name="block" class="form-control" required>
-                <option value="">-- Select Block --</option>
-                {% for block in blocks %}
-                    <option value="{{ block }}">{{ block }}</option>
+            <label class="form-label">Room</label>
+            <select name="room" class="form-control" required>
+                <option value="">-- Select Room --</option>
+                {% for room in rooms %}
+                    <option value="{{ room.id }}">{{ room.room_name }} ({{ room.room_type.type_name }})</option>
                 {% endfor %}
             </select>
         </div>
 
-        <!-- Floor -->
-        <div class="mb-3">
-            <label class="form-label">Floor</label>
-            <select name="floor" class="form-control" required>
-                <option value="">-- Select Floor --</option>
-                {% for value, label in floors %}
-                    <option value="{{ value }}">{{ label }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Room Type -->
-        <div class="mb-3">
-            <label class="form-label">Room Type</label>
-            <select name="room_type" class="form-control" required>
-                <option value="">-- Select Room Type --</option>
-                {% for type in room_types %}
-                    <option value="{{ type.0 }}">{{ type.1 }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <hr>
-
-        <!-- ================= ROOM SELECTION ================= -->
-        <select name="room" id="roomDropdown" class="form-control" required>
-            <option value="">Select Room</option>
-            {% for room in rooms %}
-                <option value="{{ room.id }}">
-                    {{ room.room_name }} - {{ room.department.department_name }}
-                </option>
-            {% endfor %}
-        </select>
-        <hr>
-
-        <!-- ================= BOOKING DETAILS ================= -->
-        <h5 class="mb-3">Booking Details</h5>
-
-        <!-- Date -->
         <div class="mb-3">
             <label class="form-label">Date</label>
             <input type="date" name="date" class="form-control" required>
         </div>
 
-        <!-- Start Time -->
         <div class="mb-3">
             <label class="form-label">Start Time</label>
             <input type="time" name="start_time" class="form-control" required>
         </div>
 
-        <!-- End Time -->
         <div class="mb-3">
             <label class="form-label">End Time</label>
             <input type="time" name="end_time" class="form-control" required>
         </div>
 
-        <!-- Purpose -->
         <div class="mb-3">
             <label class="form-label">Purpose</label>
             <textarea name="purpose" class="form-control" rows="3" required></textarea>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-success w-100">
-            Book Room
-        </button>
-
+        <button type="submit" class="btn btn-success w-100">Book Room</button>
     </form>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const block = document.querySelector('[name="block"]');
-    const floor = document.querySelector('[name="floor"]');
-    const roomType = document.querySelector('[name="room_type"]');
-    const roomDropdown = document.getElementById("roomDropdown");
-
-    function loadRooms() {
-
-        const blockValue = block.value;
-        const floorValue = floor.value;
-        const typeValue = roomType.value;
-
-        if (blockValue && floorValue && typeValue) {
-
-            fetch(`/ajax/load-rooms/?block=${blockValue}&floor=${floorValue}&room_type=${typeValue}`)
-                .then(response => response.json())
-                .then(data => {
-
-                    roomDropdown.innerHTML = '<option value="">Select Room</option>';
-
-                    data.forEach(room => {
-                        roomDropdown.innerHTML += 
-                            `<option value="${room.id}">${room.name}</option>`;
-                    });
-
-                    if (data.length === 0) {
-                        roomDropdown.innerHTML += 
-                            '<option disabled>No rooms available</option>';
-                    }
-                });
-        }
-    }
-
-    block.addEventListener("change", loadRooms);
-    floor.addEventListener("change", loadRooms);
-    roomType.addEventListener("change", loadRooms);
-
-});
-</script>
-
 {% endblock %}

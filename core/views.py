@@ -5,7 +5,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.http import JsonResponse
+from .models import RoomType
 from django.db.models import Q
+from django.views.decorators.cache import never_cache
 from datetime import date
 
 from .models import Booking, Room, Block
@@ -129,7 +131,6 @@ def view_rooms(request):
 
 # -------------------------
 # Add Room (Admin Only)
-# -------------------------
 
 @login_required
 @user_passes_test(is_admin)
@@ -153,11 +154,17 @@ def add_room(request):
 
 @login_required
 def create_booking(request):
-
-    rooms = Room.objects.filter(is_available=True)
     blocks = Block.objects.all()
-    floors = Room.FLOOR_CHOICES
-    room_types = Room.ROOM_TYPE_CHOICES
+    rooms = Room.objects.none()  # empty by default
+
+    selected_block_name = request.GET.get('block_name')
+
+    if selected_block_name:
+        try:
+            block = Block.objects.get(block_name=selected_block_name)
+            rooms = Room.objects.filter(block=block, is_available=True)
+        except Block.DoesNotExist:
+            rooms = Room.objects.none()
 
     if request.method == 'POST':
         room_id = request.POST.get('room')
@@ -166,6 +173,7 @@ def create_booking(request):
         end_time = request.POST.get('end_time')
         purpose = request.POST.get('purpose')
 
+        # Conflict check
         conflict = Booking.objects.filter(
             room_id=room_id,
             date=booking_date
@@ -191,13 +199,12 @@ def create_booking(request):
         return redirect('dashboard')
 
     return render(request, 'create_booking.html', {
-        'rooms': rooms,
         'blocks': blocks,
-        'floors': floors,
-        'room_types': room_types,
+        'rooms': rooms,
+        'selected_block_name': selected_block_name
     })
 
-# -------------------------
+
 # Manage Bookings (Admin)
 # -------------------------
 
@@ -247,7 +254,6 @@ def reject_booking(request, booking_id):
 
 # -------------------------
 # Available Rooms Today
-# -------------------------
 
 @login_required
 def available_rooms_today(request):

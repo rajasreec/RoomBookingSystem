@@ -34,4 +34,5 @@ urlpatterns = [
      path('approve/<int:booking_id>/', views.approve_booking, name='approve_booking'),
      path('reject/<int:booking_id>/', views.reject_booking, name='reject_booking'),
      path("approve-bookings/", views.approve_bookings, name="approve_bookings"),
+     path('ajax/load-rooms/', views.load_rooms, name='ajax_load_rooms')
 ]

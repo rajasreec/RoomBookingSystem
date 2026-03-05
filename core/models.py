@@ -54,6 +54,13 @@ class Block(models.Model):
         return self.block_name
 
 
+
+class RoomType(models.Model):
+    type_name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.type_name
+    
 # -------------------------
 # Room Model
 # -------------------------
@@ -66,26 +73,22 @@ class Room(models.Model):
         ('Third', 'Third'),
     ]
 
-    ROOM_TYPE_CHOICES = [
-        ('Lab', 'Lab'),
-        ('Classroom', 'Classroom'),
-        ('Seminar Hall', 'Seminar Hall'),
-    ]
-
     room_name = models.CharField(max_length=100)
     room_capacity = models.IntegerField()
 
     block = models.ForeignKey(Block, on_delete=models.CASCADE)
 
     floor = models.CharField(max_length=20, choices=FLOOR_CHOICES)
-    room_type = models.CharField(max_length=100, choices=ROOM_TYPE_CHOICES)
+
+    room_type = models.ForeignKey(
+        RoomType,
+        on_delete=models.CASCADE
+    )
+
     is_available = models.BooleanField(default=True)
 
-    class Meta:
-        ordering = ['room_name']
-
     def __str__(self):
-        return self.room_name
+        return f"{self.room_name} ({self.room_type})"
 
 
 # -------------------------
