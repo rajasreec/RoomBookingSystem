@@ -11,10 +11,8 @@ from .models import (
     Block,
     Room,
     Hall,
-    RoomDepartment,
     Booking,
     Report,
-    EmailNotification
 )
 
 # Register Department
@@ -45,9 +43,9 @@ class HallAdmin(admin.ModelAdmin):
 
 
 # Register RoomDepartment
-@admin.register(RoomDepartment)
-class RoomDepartmentAdmin(admin.ModelAdmin):
-    list_display = ('room', 'department', 'class_dept')
+#@admin.register(RoomDepartment)
+#class RoomDepartmentAdmin(admin.ModelAdmin):
+ #   list_display = ('room', 'department', 'class_dept')
 
 
 # Register Booking
@@ -74,9 +72,9 @@ class ReportAdmin(admin.ModelAdmin):
 
 
 # Register EmailNotification
-@admin.register(EmailNotification)
-class EmailNotificationAdmin(admin.ModelAdmin):
-    list_display = ('notification_id', 'booking', 'sent_time')
+#@admin.register(EmailNotification)
+#class EmailNotificationAdmin(admin.ModelAdmin):
+#    list_display = ('notification_id', 'booking', 'sent_time')
 
 
 admin.site.register(RoomType)

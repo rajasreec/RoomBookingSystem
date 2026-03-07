@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.views.decorators.cache import never_cache
 from datetime import date
 
-from .models import Booking, Room, Block
+from .models import Booking, Room, Block ,Department
 from .forms import RoomForm
 
 User = get_user_model()
@@ -154,53 +154,56 @@ def add_room(request):
 
 @login_required
 def create_booking(request):
-    blocks = Block.objects.all()
-    rooms = Room.objects.none()  # empty by default
+        blocks = Block.objects.all()
+        rooms = Room.objects.none()  # empty by default
+        departments = Department.objects.all()
+        selected_block_name = request.GET.get('block_name')
 
-    selected_block_name = request.GET.get('block_name')
+        if selected_block_name:
+            try:
+                block = Block.objects.get(block_name=selected_block_name)
+                rooms = Room.objects.filter(block=block, is_available=True)
+            except Block.DoesNotExist:
+                rooms = Room.objects.none()
 
-    if selected_block_name:
-        try:
-            block = Block.objects.get(block_name=selected_block_name)
-            rooms = Room.objects.filter(block=block, is_available=True)
-        except Block.DoesNotExist:
-            rooms = Room.objects.none()
+        if request.method == 'POST':
+            room_id = request.POST.get('room')
+            department_id = request.POST.get("department")
+            booking_date = request.POST.get('date')
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+            purpose = request.POST.get('purpose')
 
-    if request.method == 'POST':
-        room_id = request.POST.get('room')
-        booking_date = request.POST.get('date')
-        start_time = request.POST.get('start_time')
-        end_time = request.POST.get('end_time')
-        purpose = request.POST.get('purpose')
+            # Conflict check
+            conflict = Booking.objects.filter(
+                room_id=room_id,
+                date=booking_date
+            ).filter(
+                Q(start_time__lt=end_time) & Q(end_time__gt=start_time)
+            ).exists()
 
-        # Conflict check
-        conflict = Booking.objects.filter(
-            room_id=room_id,
-            date=booking_date
-        ).filter(
-            Q(start_time__lt=end_time) & Q(end_time__gt=start_time)
-        ).exists()
+            if conflict:
+                messages.error(request, "Room already booked for selected time.")
+                return redirect('create_booking')
 
-        if conflict:
-            messages.error(request, "Room already booked for selected time.")
-            return redirect('create_booking')
+            Booking.objects.create(
+                user=request.user,
+                room_id=room_id,
+                department_id=department_id,  
+                date=booking_date,
+                start_time=start_time,
+                end_time=end_time,
+                purpose=purpose,
+                status="Pending"
+            )
 
-        Booking.objects.create(
-            user=request.user,
-            room_id=room_id,
-            date=booking_date,
-            start_time=start_time,
-            end_time=end_time,
-            purpose=purpose,
-            status="Pending"
-        )
+            messages.success(request, "Booking request submitted successfully!")
+            return redirect('dashboard')
 
-        messages.success(request, "Booking request submitted successfully!")
-        return redirect('dashboard')
-
-    return render(request, 'create_booking.html', {
+        return render(request, 'create_booking.html', {
         'blocks': blocks,
         'rooms': rooms,
+        'departments': departments,   
         'selected_block_name': selected_block_name
     })
 

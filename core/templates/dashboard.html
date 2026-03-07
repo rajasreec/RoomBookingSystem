@@ -10,7 +10,7 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row text-center mt-4">
+       <div class="row text-center mt-4">
 
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm border-0 bg-primary text-white">
@@ -20,25 +20,20 @@
                 </div>
             </div>
         </div>
+        
 
         <div class="col-md-4 mb-3">
-            <div class="card shadow-sm border-0 bg-danger text-white">
-                <div class="card-body">
-                    <h5>Booked Today</h5>
-                    <h3>{{ booked_today }}</h3>
+            <a href="{% url 'available_rooms_today' %}" style="text-decoration: none;">
+                <div class="card shadow-sm border-0 bg-success text-white">
+                    <div class="card-body text-center">
+                        <h5>Available Room Today</h5>
+                        <h3>{{ available_rooms_today }}</h3>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
-<div class="col-md-4 mb-3">
-    <a href="{% url 'available_rooms_today' %}" style="text-decoration: none;">
-        <div class="card shadow-sm border-0 bg-success text-white">
-            <div class="card-body text-center">
-                <h5>Available Room Today</h5>
-                <h3>{{ available_rooms_today }}</h3>
-            </div>
-        </div>
-    </a>
-</div>
+
+    </div>
 
     <!-- Quick Actions -->
     <div class="mt-4">
@@ -54,7 +49,7 @@
             Create Booking
         </a>
 
-        <!-- Approve Bookings (Superuser Only) -->
+        <!-- Approve Bookings -->
         {% if user.is_superuser %}
         <a href="{% url 'approve_bookings' %}" 
            class="btn btn-lg me-2"
@@ -67,7 +62,7 @@
         </a>
         {% endif %}
 
-        <!-- Add Room (Superuser Only) -->
+        <!-- Add Room -->
         {% if user.is_superuser %}
         <a href="{% url 'add_room' %}" 
            class="btn btn-lg me-2"
@@ -101,6 +96,7 @@
             <tr>
                 <th>Room</th>
                 <th>Date</th>
+                <th>Department</th>
                 <th>Time</th>
                 <th>Status</th>
             </tr>
@@ -110,6 +106,7 @@
             <tr>
                 <td>{{ booking.room.room_name }}</td>
                 <td>{{ booking.date }}</td>
+                <td>{{ booking.department.department_name }}</td>
                 <td>{{ booking.start_time }} - {{ booking.end_time }}</td>
                 <td>
                     {% if booking.status == "Approved" %}
@@ -123,14 +120,13 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center">No recent bookings</td>
+                <td colspan="5" class="text-center">No recent bookings</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-
-    <!-- Pending Booking Requests (Superuser Only) -->
+    <!-- Pending Booking Requests -->
     {% if user.is_superuser and pending_bookings %}
     <h3 class="mt-5">Pending Booking Requests</h3>
 
@@ -138,6 +134,7 @@
         <thead class="table-light">
             <tr>
                 <th>User</th>
+                <th>Department</th>
                 <th>Room</th>
                 <th>Date</th>
                 <th>Action</th>
@@ -147,6 +144,7 @@
             {% for booking in pending_bookings %}
             <tr>
                 <td>{{ booking.user.username }}</td>
+                <td>{{ booking.department.department_name }}</td>
                 <td>{{ booking.room.room_name }}</td>
                 <td>{{ booking.date }}</td>
                 <td>

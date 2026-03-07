@@ -112,13 +112,13 @@ class Hall(models.Model):
 # -------------------------
 # Room-Department Mapping
 # -------------------------
-class RoomDepartment(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    class_dept = models.CharField(max_length=100)
+#class RoomDepartment(models.Model):
+#    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+#    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+#    class_dept = models.CharField(max_length=100)
 
-    def __str__(self):
-        return f"{self.room} - {self.department}"
+#    def __str__(self):
+#        return f"{self.room} - {self.department}"
 
 
 # -------------------------
@@ -133,10 +133,12 @@ class Booking(models.Model):
     ]
 
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)  
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
+    #dept_name = models.ForeignKey(Department,on_delete=models.CASCADE)
     purpose = models.TextField(null=True,blank=True)
 
     status = models.CharField(
@@ -191,17 +193,17 @@ class Report(models.Model):
 # -------------------------
 # Email Notifications Model
 # -------------------------
-class EmailNotification(models.Model):
+#class EmailNotification(models.Model):
 
-    notification_id = models.AutoField(primary_key=True)
+#    notification_id = models.AutoField(primary_key=True)
+#
+#    booking = models.ForeignKey(
+#        Booking,
+#        on_delete=models.CASCADE
+#    )
 
-    booking = models.ForeignKey(
-        Booking,
-        on_delete=models.CASCADE
-    )
+ #   message = models.TextField()
+ #   sent_time = models.DateTimeField(auto_now_add=True)
 
-    message = models.TextField()
-    sent_time = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Notification {self.id}"
+ #   def __str__(self):
+ #       return f"Notification {self.id}"

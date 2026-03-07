@@ -20,40 +20,57 @@
     </form>
 
     <!-- ================= BOOKING FORM ================= -->
-    <form method="POST">
-        {% csrf_token %}
+<form method="POST">
+    {% csrf_token %}
 
-        <div class="mb-3">
-            <label class="form-label">Room</label>
-            <select name="room" class="form-control" required>
-                <option value="">-- Select Room --</option>
-                {% for room in rooms %}
-                    <option value="{{ room.id }}">{{ room.room_name }} ({{ room.room_type.type_name }})</option>
-                {% endfor %}
-            </select>
-        </div>
+    <!-- Department -->
+    <div class="mb-3">
+        <label class="form-label">Department</label>
+        <select name="department" class="form-control" required>
+            <option value="">-- Select Department --</option>
+            {% for dept in departments %}
+                <option value="{{ dept.id }}">{{ dept.department_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Date</label>
-            <input type="date" name="date" class="form-control" required>
-        </div>
+    <!-- Room -->
+    <div class="mb-3">
+        <label class="form-label">Room</label>
+        <select name="room" class="form-control" required>
+            <option value="">-- Select Room --</option>
+            {% for room in rooms %}
+                <option value="{{ room.id }}">
+                    {{ room.room_name }} ({{ room.room_type.type_name }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Start Time</label>
-            <input type="time" name="start_time" class="form-control" required>
-        </div>
+    <!-- Date -->
+    <div class="mb-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-control" required>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">End Time</label>
-            <input type="time" name="end_time" class="form-control" required>
-        </div>
+    <!-- Start Time -->
+    <div class="mb-3">
+        <label class="form-label">Start Time</label>
+        <input type="time" name="start_time" class="form-control" required>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Purpose</label>
-            <textarea name="purpose" class="form-control" rows="3" required></textarea>
-        </div>
+    <!-- End Time -->
+    <div class="mb-3">
+        <label class="form-label">End Time</label>
+        <input type="time" name="end_time" class="form-control" required>
+    </div>
 
-        <button type="submit" class="btn btn-success w-100">Book Room</button>
-    </form>
-</div>
+    <!-- Purpose -->
+    <div class="mb-3">
+        <label class="form-label">Purpose</label>
+        <textarea name="purpose" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">Book Room</button>
+</form>
 {% endblock %}
